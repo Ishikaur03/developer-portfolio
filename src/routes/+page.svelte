@@ -1,38 +1,42 @@
 <script context="module">
-      +import { client } from '$lib/graphql-client'
-      -import { gql, GraphQLClient } from 'graphql-request'
-      +import { gql } from 'graphql-request'
-    
-      export const load = async () => {
-    -   const client = new GraphQLClient(import.meta.env.VITE_GRAPHQL_API)
-    
-        const query = gql`
-          query GetProjects {
-            projects {
-              name
-              slug
-              description
-              demo
-              sourceCode
-              image {
-                url
-              }
+    import ProjectCard from '$lib/components/project-card.svelte'
+    import { client } from '$lib/graphql-client'
+    import { gql } from 'graphql-request'
+  
+    export const load = async () => {
+      const query = gql`
+        query GetProjects {
+          projects {
+            name
+            slug
+            description
+            tags
+            demo
+            sourceCode
+            image {
+              url
             }
           }
-        `
-    
-        const { projects } = await client.request(query)
-    
-        return {
-          props: {
-            projects,
-          },
         }
+      `
+      const { projects } = await client.request(query)
+  
+      return {
+        props: {
+          projects,
+        },
       }
-    </script>
-    
-    <script>
-      export let projects
-    </script>
-    
-    <pre>{JSON.stringify(projects, null, 2)}</pre>
+    }
+  </script>
+  
+  <script>
+    export let projects
+  </script>
+  
+  <h1>Recent Projects by Me</h1>
+  
+  <div>
+    {#each projects as { name, slug, description, image }}
+      <ProjectCard {name} {description} url={image[0].url} {slug} />
+    {/each}
+  </div>
